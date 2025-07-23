@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 )
@@ -30,8 +31,35 @@ func aboutHandlar(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintln(w, "I'm Habi.., a student")
 }
 
+type Product struct {
+	ID          int     `json:"id"`
+	Title       string  `json:"title"`
+	Description string  `json:"description"`
+	Price       float64 `json:"price"`
+	ImgURL      string  `json:"image"`
+}
+
+var productList []Product
+
+func getProducts(w http.ResponseWriter, r *http.Request) {
+
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Content-Type", "application/json")
+
+	if r.Method != http.MethodGet {
+		http.Error(w, "Plz give me valid request", 400)
+		return
+	}
+
+	encoder := json.NewEncoder(w)
+	encoder.Encode(productList)
+
+}
+
 func main() {
 	mux := http.NewServeMux()
+
+	mux.HandleFunc("/products", getProducts)
 
 	mux.HandleFunc("/hello", helloHandlar)
 
@@ -45,4 +73,48 @@ func main() {
 		fmt.Println("Error: ", err)
 	}
 
+}
+
+func init() {
+	prd1 := Product{
+		ID:          1,
+		Title:       "Orange",
+		Description: "It's very delicious and full of vitamin C.",
+		Price:       108.00,
+		ImgURL:      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTnzv3PeLyF9-dxIj0MGIabXMKYA6CFTB-0OA&s",
+	}
+
+	prd2 := Product{
+		ID:          2,
+		Title:       "Apple",
+		Description: "Crisp and sweet red apples.",
+		Price:       120.50,
+		ImgURL:      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTnzv3PeLyF9-dxIj0MGIabXMKYA6CFTB-0OA&s",
+	}
+
+	prd3 := Product{
+		ID:          3,
+		Title:       "Banana",
+		Description: "Rich in potassium and easy to digest.",
+		Price:       60.00,
+		ImgURL:      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTnzv3PeLyF9-dxIj0MGIabXMKYA6CFTB-0OA&s",
+	}
+
+	prd4 := Product{
+		ID:          4,
+		Title:       "Mango",
+		Description: "The king of fruits, sweet and juicy.",
+		Price:       150.75,
+		ImgURL:      "https://example.com/images/mango.jpg",
+	}
+
+	prd5 := Product{
+		ID:          5,
+		Title:       "Watermelon",
+		Description: "Refreshing and hydrating summer fruit.",
+		Price:       200.00,
+		ImgURL:      "https://example.com/images/watermelon.jpg",
+	}
+
+	productList = append(productList, prd1, prd2, prd3, prd4, prd5)
 }
