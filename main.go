@@ -51,8 +51,44 @@ func getProducts(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	encoder := json.NewEncoder(w)
-	encoder.Encode(productList)
+	// encoder := json.NewEncoder(w)
+	// encoder.Encode(productList)
+	json.NewEncoder(w).Encode(productList)
+}
+
+func createProduct(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Methods", "POST")
+	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+	w.Header().Set("Content-Type", "application/json")
+
+	if r.Method == "OPTIONS" {
+		w.WriteHeader(200)
+		return
+	}
+
+	if r.Method != http.MethodPost {
+		http.Error(w, "Please give me post request", 400)
+		return
+	}
+
+	var newProduct Product
+
+	decoder := json.NewDecoder(r.Body)
+	err := decoder.Decode(&newProduct)
+
+	if err != nil {
+		fmt.Println(err)
+		http.Error(w, "Plz give me valid JSON data", 400)
+		return
+	}
+
+	newProduct.ID = len(productList) + 1
+
+	productList = append(productList, newProduct)
+	w.WriteHeader(201)
+
+	json.NewEncoder(w).Encode(newProduct)
 
 }
 
@@ -60,6 +96,7 @@ func main() {
 	mux := http.NewServeMux()
 
 	mux.HandleFunc("/products", getProducts)
+	mux.HandleFunc("/add-product", createProduct)
 
 	mux.HandleFunc("/hello", helloHandlar)
 
