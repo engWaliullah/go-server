@@ -43,8 +43,7 @@ var productList []Product
 
 func getProducts(w http.ResponseWriter, r *http.Request) {
 
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-	w.Header().Set("Content-Type", "application/json")
+	handleCors(w)
 
 	if r.Method != http.MethodGet {
 		http.Error(w, "Plz give me valid request", 400)
@@ -57,10 +56,8 @@ func getProducts(w http.ResponseWriter, r *http.Request) {
 }
 
 func createProduct(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-	w.Header().Set("Access-Control-Allow-Methods", "POST")
-	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
-	w.Header().Set("Content-Type", "application/json")
+
+	handleCors(w)
 
 	if r.Method == "OPTIONS" {
 		w.WriteHeader(200)
@@ -90,6 +87,13 @@ func createProduct(w http.ResponseWriter, r *http.Request) {
 
 	json.NewEncoder(w).Encode(newProduct)
 
+}
+
+func handleCors(w http.ResponseWriter) {
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Access-Control-Allow-Methods", "POST")
+	w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Habib") // preflight request wiht OPTIONS
 }
 
 func main() {
